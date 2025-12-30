@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meric</title>
+    
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="sidebar hidden" id="sidebar">
+        <div class="logo">
+            <img src="logo.png" alt="Meric Logo" class="sidebar-logo-img"> 
+            <span>Meric</span>
+        </div>
+        <ul>
+            <li onclick="navigate('home')"><i class="fa-solid fa-house"></i> Home</li>
+            <li onclick="navigate('identify')"><i class="fa-solid fa-magnifying-glass"></i> Identify</li>
+            <li onclick="navigate('saved')"><i class="fa-solid fa-bookmark"></i> Saved</li>
+            <li onclick="navigate('history')"><i class="fa-solid fa-clock-rotate-left"></i> History</li>
+            <li onclick="navigate('profile')"><i class="fa-solid fa-user-doctor"></i> Profile</li>
+            <li onclick="navigate('about')"><i class="fa-solid fa-circle-info"></i> About Us</li>
+            <li onclick="logout()" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</li>
+        </ul>
+    </nav>
+
+    <main id="main-content">
+        
+        <section id="login" class="page active">
+            <div class="login-container">
+                <h1>Meric</h1>
+                <p>Advanced Medicine Identification System</p>
+                <form onsubmit="handleLogin(event)">
+                    <input type="email" placeholder="Student Email" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit">Access System</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="home" class="page hidden">
+            <div class="hero">
+                <h1>Welcome to Meric</h1>
+                <p id="welcome-msg">Your personal AI Pharmacist Assistant.</p>
+                <div class="cards-grid">
+                    <div class="card" onclick="navigate('identify')">
+                        <i class="fa-solid fa-camera"></i>
+                        <h3>Scan Medicine</h3>
+                        <p>Upload an image to analyze.</p>
+                    </div>
+                    <div class="card" onclick="navigate('profile')">
+                        <i class="fa-solid fa-file-medical"></i>
+                        <h3>Medical Profile</h3>
+                        <p>Update your health data for better accuracy.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="identify" class="page hidden">
+            <h2><i class="fa-solid fa-microscope"></i> Identify Medicine</h2>
+            
+            <div class="scan-box">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('upload')">Upload Image</button>
+                    <button class="tab-btn" onclick="switchTab('text')">Enter Name</button>
+                </div>
+
+                <div id="upload-mode" class="input-mode">
+                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Click to Upload Medicine Image</p>
+                        <input type="file" id="fileInput" accept="image/*" hidden onchange="previewImage(event)">
+                    </div>
+                    <img id="imagePreview" class="hidden">
+                </div>
+
+                <div id="text-mode" class="input-mode hidden">
+                    <input type="text" id="manualInput" placeholder="Enter medicine name (e.g., Panadol)">
+                </div>
+
+                <button class="action-btn" onclick="analyzeMedicine()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Search
+                </button>
+            </div>
+
+            <div id="result-area" class="result-box hidden">
+                <div class="result-header">
+                    <h3>Analysis Result</h3>
+                    <div class="result-actions">
+                        <button onclick="speakText()"><i class="fa-solid fa-volume-high"></i> Listen</button>
+                        <button onclick="saveResult(event)"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                    </div>
+                </div>
+                <div id="ai-content" class="markdown-body"></div>
+            </div>
+        </section>
+
+        <section id="saved" class="page hidden">
+            <h2>Saved Medicines</h2>
+            <div id="saved-list" class="list-container"></div>
+        </section>
+
+        <section id="history" class="page hidden">
+            <h2>Search History</h2>
+            <div id="history-list" class="list-container"></div>
+        </section>
+
+        <section id="profile" class="page hidden">
+            <h2>Medical Profile</h2>
+            <p class="subtitle">Optional: Provide details for personalized AI advice.</p>
+            <form class="profile-form" onsubmit="saveProfile(event)">
+                <label>Age</label>
+                <input type="number" id="p-age" placeholder="e.g. 24"><br><br>
+
+                <label>Gender</label>
+                <select id="p-gender">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select><br><br>
+                
+                <label>Allergies</label>
+                <input type="text" id="p-allergies" placeholder="e.g. Penicillin, Peanuts">
+                
+                <label>Existing Conditions</label>
+                <textarea id="p-conditions" placeholder="e.g. Diabetes, High Blood Pressure"></textarea>
+                
+                <button type="submit">Save Profile</button>
+            </form>
+        </section>
+
+        <section id="about" class="page hidden">
+            <div class="about-container">
+                <div class="about-hero">
+                    <h1>About Meric</h1>
+                    <p>At Meric, we bridge the gap between complex medical data and everyday understanding.</p>
+                </div>
+            
+                <div class="features-gallery">
+                    <h2>Our Core Features</h2>
+                    <div class="gallery-grid">
+                        <div class="gallery-item">
+                            <i class="fa-solid fa-brain"></i>
+                            <h3>AI Analysis</h3>
+                            <p>Instant identification using advanced AI models.</p>
+                        </div>
+                        <div class="gallery-item">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <h3>Secure Data</h3>
+                            <p>Your medical profile is stored locally and securely.</p>
+                        </div>
+                        <div class="gallery-item">
+                            <i class="fa-solid fa-language"></i>
+                            <h3>Voice Support</h3>
+                            <p>Text-to-speech for accessibility and ease of use.</p>
+                        </div>
+                        <div class="gallery-item">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            <h3>History Tracking</h3>
+                            <p>Keep a digital log of all your scanned medicines.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-grid">
+                    <div class="team-card">
+                        <img src="taha.jpg" alt="Taha Mahtab" class="member-img">
+                        <h3>Taha Mahtab</h3>
+                        <p>HTML Layout and Planning</p>
+                    </div>
+                    <div class="team-card">
+                        <img src="abdullah.jpg" alt="Abdullah Chaudary" class="member-img">
+                        <h3>Abdullah Chaudary</h3>
+                        <p>Javascript and APIs</p>
+                    </div>
+                    <div class="team-card">
+                        <img src="ahmed.jpg" alt="Ahmed Awan" class="member-img">
+                        <h3>Ahmed Awan</h3>
+                        <p>CSS & UI/UX Design</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="why-mediscan">
+                <h2>Why MedScan AI</h2>
+
+                <h3>Global Medication Error Impacts</h3>
+                <table border="1" cellpadding="8" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Statistic</th>
+                            <th>Number</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Annual deaths from medication errors</td>
+                            <td>250,000 (US estimate); up to 500,000+ (Pakistan-specific)</td>
+                            <td>Medical errors, including wrong medication, cause over 250,000 US deaths yearly; Pakistan sees 500,000+ from errors like medication mistakes</td>
+                        </tr>
+                        <tr>
+                            <td>Hospital admissions from adverse drug reactions</td>
+                            <td>6.5-10% of admissions</td>
+                            <td>Rates rising globally; one study found 6.5% of admissions due to ADRs</td>
+                        </tr>
+                        <tr>
+                            <td>Injured annually from medication errors</td>
+                            <td>1.3 million (US); $42 billion global cost</td>
+                            <td>Errors injure 1.3M in US alone, with worldwide economic impact of $42B</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Illiteracy and Medication Understanding</h3>
+                <table border="1" cellpadding="8" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Statistic</th>
+                            <th>Rate/Number</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Global adult illiteracy</td>
+                            <td>763 million adults (13-14% illiterate)</td>
+                            <td>763M adults lack basic literacy skills as of 2020; global literacy at 86.3% for ages 15+</td>
+                        </tr>
+                        <tr>
+                            <td>Illiterate patients understanding discharge meds (Pakistan hospital)</td>
+                            <td>5-12% without aids</td>
+                            <td>In Lahore hospital, only 5% of illiterate patients understood meds without counseling, rising to 12% with it</td>
+                        </tr>
+                        <tr>
+                            <td>Pakistan context: Literacy barriers to adherence</td>
+                            <td>Majority illiterate/unemployed affected</td>
+                            <td>Low literacy leads to poor adherence; prescriptions often in English exacerbate issues</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Pakistan-Specific Risks</h3>
+                <p>
+                    Over 500,000 annual deaths occur from medical errors including medication issues, worsened by only 5% of pharmacies having trained pharmacists. Hospital errors claim 18-20% of inpatients' lives, often from drug misadministration. MedScan AI addresses this by simplifying information for illiterate users.
+                </p>
+            </div>
+
+            <div class="counter-box">
+                <h2 id="uptime-counter">00:00:00:00</h2>
+                <p>Time since we started changing lives</p>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="loader" class="loader-overlay hidden">
+        <div class="spinner"></div>
+        <p>Consulting AI...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> 
+    <script src="script.js"></script>
+</body>
+</html>
